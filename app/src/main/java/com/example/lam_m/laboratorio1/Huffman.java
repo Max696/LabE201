@@ -2,6 +2,7 @@ package com.example.lam_m.laboratorio1;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Map;
 
 public class Huffman {
 
@@ -9,16 +10,17 @@ public class Huffman {
     ArrayList<Simbolo> letra_prob;
     String textoOriginal;
 
-    Huffman(ArrayList<Simbolo> letra_probabilidad, String texto){
-
+    Huffman( String texto){
+        ArrayList<Simbolo> letra_probabilidad = new ArrayList<>();
         nodos = new ArrayList<>();
         textoOriginal = texto;
 
         for (int i =0;i<letra_probabilidad.size();i++){
             if (i==0){
                 //Iniciando
+
                 iniciar(letra_probabilidad.get(0),letra_probabilidad.get(1));
-                i=2;
+                i=1;
             }else {
                 if (letra_probabilidad.get(i).getFrecuencia() + letra_probabilidad.get(i+1).getFrecuencia() <= nodos.get(0).getProbabilidad()){
                     //Se crea nuevo subarbol cuando las proximas dos frecuencais
@@ -28,7 +30,7 @@ public class Huffman {
                     Nodo nuevoNodo = new Nodo(hijoIzq,hijoDer);
                     nodos.add(nuevoNodo);
                     Collections.sort(nodos);
-                    i = i+3; //Matematicas hijo!!
+                    i = i+2; //Matematicas hijo!!
                 }else {
                     //Se agregan al primer nodo del listado
                     Nodo nodoProbabilidad = nodos.get(0);
