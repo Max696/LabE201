@@ -41,7 +41,7 @@ public class ArrayDeSimbolos {
 
         ArrayList<Simbolo> ty=new ArrayList<>();
         for (Map.Entry<Character , Integer> entry : treemap.entrySet()) {
-            ty.add(new Simbolo(entry.getKey(),entry.getValue()/texto.length()));
+            ty.add(new Simbolo(entry.getKey(),entry.getValue()));
         }
         resultante=ty;
 

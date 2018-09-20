@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -26,7 +27,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     EditText name;
     Huffman hf;
     String codificacion;
+    String totalName="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,29 +89,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private String readText(String input){
+    private String  readText(Uri uri) throws IOException {
 
-        File file = new File(input);
-        StringBuilder text = new StringBuilder();
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line;
-            while((line= br.readLine())!=null)
-            {
-                text.append(line);
-                text.append("\n");
-
-            }
-            br.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        InputStream input = getContentResolver().openInputStream(uri);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        StringBuilder stringBuilder = new StringBuilder();
+        String Line;
+        while ((Line = reader.readLine()) != null) {
+            stringBuilder.append(Line);
         }
-        return  text.toString();
+        input.close();
+        reader.close();
+        return stringBuilder.toString();
     }
-
     private void performFileSearch()
     {
         Intent inten = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -116,28 +112,24 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode==READ_REQUEST_CODE&&resultCode==Activity.RESULT_OK)
-        {
-            if(data!=null)
-            {
+        if(requestCode==READ_REQUEST_CODE&&resultCode==Activity.RESULT_OK) {
+            if (data != null) {
                 Uri uri = data.getData();
-                String path = uri.getPath();
-                path = path.substring(path.indexOf(":")+1);
-               // Toast.makeText(this, ""+path, Toast.LENGTH_SHORT).show();
-                txt_out.setText(readText(path));//texto
+                totalName = uri.getLastPathSegment();
+                Toast.makeText(this, uri.getPath(), Toast.LENGTH_LONG).show();
+
                 try {
-                    hf = new Huffman(readText(path));
+                    readText(uri);
+                    String s = readText(uri);
+                    hf = new Huffman(s);
                     codificacion = hf.cifrado1();
-
-                    Toast.makeText(this, "It works", Toast.LENGTH_SHORT).show();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                catch (Exception e)
-                {
-                    Toast.makeText(this, ":( We try it", Toast.LENGTH_SHORT).show();
-                }
-
             }
         }
+
+
     }
 
     private void saveTextAsFile(String filename , String content ) throws FileNotFoundException {

@@ -30,17 +30,30 @@ public class Huffman {
                 iniciar(letra_probabilidad.get(0),letra_probabilidad.get(1));
                 i=1;
             }else {
-                if (letra_probabilidad.get(i).getFrecuencia() + letra_probabilidad.get(i+1).getFrecuencia() <= nodos.get(0).getProbabilidad()){
+                if (letra_probabilidad.size()-i>2)
+                {
+                if (letra_probabilidad.get(i).getFrecuencia() + letra_probabilidad.get(i+1).getFrecuencia() <= nodos.get(0).getProbabilidad()) {
                     //Se crea nuevo subarbol cuando las proximas dos frecuencais
                     //Son menores o iguales a la primera frecuencia en nodos
                     Nodo hijoIzq = new Nodo(letra_probabilidad.get(i));
-                    Nodo hijoDer = new Nodo(letra_probabilidad.get(i+1));
-                    Nodo nuevoNodo = new Nodo(hijoIzq,hijoDer);
+                    Nodo hijoDer = new Nodo(letra_probabilidad.get(i + 1));
+                    Nodo nuevoNodo = new Nodo(hijoIzq, hijoDer);
                     nuevoNodo.hijoIzquierdo.padre = nuevoNodo;
                     nuevoNodo.hijoDerecho.padre = nuevoNodo;
                     nodos.add(nuevoNodo);
                     Collections.sort(nodos);
-                    i = i+2; //Matematicas hijo!!
+                    i = i + 2; //Matematicas hijo!!
+                }
+                else {
+                    //Se agregan al primer nodo del listado
+                    Nodo nodoProbabilidad = nodos.get(0);
+                    Nodo nuevoNodo = new Nodo(letra_probabilidad.get(i));
+                    Nodo padre = new Nodo(nodoProbabilidad,nuevoNodo);
+                    padre.hijoIzquierdo.padre = padre;
+                    padre.hijoDerecho.padre = padre;
+                    nodos.add(padre);
+                    Collections.sort(nodos);
+                }
                 }else {
                     //Se agregan al primer nodo del listado
                     Nodo nodoProbabilidad = nodos.get(0);
