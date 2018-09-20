@@ -4,6 +4,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Huffman {
@@ -12,7 +13,8 @@ public class Huffman {
     ArrayList<Simbolo> letra_prob;
     String textoOriginal;
     String noFinal;
-
+    String arbolComprimido;
+    String toPrint;
 
     Huffman( String texto){
 
@@ -66,10 +68,16 @@ public class Huffman {
         //Asignar codigos y almacenarlo en String
         codigoGenerado(nodos.get(0));
         String txt = cifrado();
+        comprimirArbol(nodos.get(0),1);
+        txt = txt+"\n"+getArbolComprimido();
 
+        toPrint =txt;
         //Almacecnar datos en archivo
     }
-
+    public  String cifrado1()
+    {
+        return  toPrint;
+    }
     private void iniciar(Simbolo simbolo1, Simbolo simbolo2){
         Nodo nodoIzq = new Nodo(simbolo1);
         Nodo nodoDer = new Nodo(simbolo2);
@@ -90,12 +98,50 @@ public class Huffman {
         }
         return txtCifrado;
     }
+    public void comprimirArbol(Nodo nodo, int i){
+        if (nodo.simbolo == null){
+            arbolComprimido = arbolComprimido + "(" + i + ",nu)";
 
-    public void descromprimir(){
-
-
+        }else{
+            arbolComprimido = arbolComprimido + "("+i+","+ nodo.simbolo.getLetra()+")";
+        }
+        if (nodo.hijoIzquierdo != null){
+            comprimirArbol(nodo.hijoIzquierdo,i*2);
+        }
+        else if (nodo.hijoDerecho != null){
+            comprimirArbol(nodo.hijoDerecho,i*2 +1);
+        }
     }
+    public String getArbolComprimido(){
+        return arbolComprimido;
+    }
+    public void descromprimir(String texto){
 
+        ArrayList<String> s = new ArrayList();
+        String[] arrOfStr = texto.split("\\^" );
+        Map<Integer,Character> tree = new HashMap<Integer,Character>();
+
+        for(String a:arrOfStr){
+
+
+            String [] letra = a.split(",");
+            int asd = Integer.valueOf(letra[0]);
+            String Letra = letra[1];
+            char fletra;
+            if(Letra.length() >1)
+            {
+                fletra='^';
+            }
+            else
+            {
+                fletra=Letra.charAt(0);
+            }
+            tree.put(asd, fletra);
+
+        }
+
+        // TODO code application logic here
+    }
     private void codigoGenerado(Nodo nodo) {
         if (nodo.hijoIzquierdo!= null){
             if (nodo.hijoIzquierdo.simbolo != null){
@@ -109,7 +155,6 @@ public class Huffman {
             codigoGenerado(nodo.hijoDerecho);
         }
     }
-
     private void getCodigoBinario(Nodo nodo, String s, Simbolo simba){
         if (nodo.padre == null){
             if (nodo.padre.hijoIzquierdo == nodo){

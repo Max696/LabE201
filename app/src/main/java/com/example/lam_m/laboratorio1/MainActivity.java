@@ -35,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
     Button btn_load,btn_save;
     TextView txt_out;
     EditText name;
+    Huffman hf;
+    String codificacion;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
                 String filename =name.getText().toString();
 
                 try {
-                    saveTextAsFile(filename,"hola");
+                    saveTextAsFile(filename,codificacion);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
@@ -123,7 +125,8 @@ public class MainActivity extends AppCompatActivity {
                 path = path.substring(path.indexOf(":")+1);
                // Toast.makeText(this, ""+path, Toast.LENGTH_SHORT).show();
                 txt_out.setText(readText(path));//texto
-                Huffman hf = new Huffman(readText(path));
+                 hf = new Huffman(readText(path));
+                 codificacion = hf.cifrado1();
 
                 Toast.makeText(this, "prueba", Toast.LENGTH_SHORT).show();
 
