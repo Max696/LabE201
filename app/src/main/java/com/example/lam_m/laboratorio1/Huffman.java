@@ -1,5 +1,7 @@
 package com.example.lam_m.laboratorio1;
 
+import android.widget.Toast;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Map;
@@ -10,11 +12,14 @@ public class Huffman {
     ArrayList<Simbolo> letra_prob;
     String textoOriginal;
 
+
     Huffman( String texto){
-        ArrayList<Simbolo> letra_probabilidad = new ArrayList<>();
+
+        
         nodos = new ArrayList<>();
         textoOriginal = texto;
-
+        ArrayDeSimbolos as = new ArrayDeSimbolos(texto);
+        ArrayList<Simbolo> letra_probabilidad = as.getArray();
         for (int i =0;i<letra_probabilidad.size();i++){
             if (i==0){
                 //Iniciando
@@ -76,6 +81,7 @@ public class Huffman {
                 }
             }
         }
+
 
         //Guardar en un archivo .huff texto y arbol
 

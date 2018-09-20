@@ -46,7 +46,7 @@ public class ArrayDeSimbolos {
         resultante=ty;
 
     }
-    public ArrayList metodo()
+    public ArrayList getArray()
     {
         return  resultante;
 

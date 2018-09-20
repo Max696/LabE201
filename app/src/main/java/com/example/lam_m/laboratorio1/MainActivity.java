@@ -93,8 +93,12 @@ public class MainActivity extends AppCompatActivity {
                 Uri uri = data.getData();
                 String path = uri.getPath();
                 path = path.substring(path.indexOf(":")+1);
-                Toast.makeText(this, ""+path, Toast.LENGTH_SHORT).show();
-                txt_out.setText(readText(path));
+               // Toast.makeText(this, ""+path, Toast.LENGTH_SHORT).show();
+                txt_out.setText(readText(path));//texto
+                Huffman hf = new Huffman(readText(path));
+
+                Toast.makeText(this, "prueba", Toast.LENGTH_SHORT).show();
+
             }
         }
     }
