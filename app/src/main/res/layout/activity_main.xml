@@ -22,4 +22,23 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:text="" />
+
+    <Button
+        android:id="@+id/bt_save"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="74dp"
+        android:text="Guardar" />
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/tV_out"
+        android:layout_alignTop="@+id/bt_save"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Nombre Archivo" />
 </RelativeLayout>

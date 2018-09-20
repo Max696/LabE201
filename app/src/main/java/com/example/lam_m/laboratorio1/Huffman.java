@@ -11,11 +11,12 @@ public class Huffman {
     ArrayList<Nodo> nodos;
     ArrayList<Simbolo> letra_prob;
     String textoOriginal;
+    String noFinal;
 
 
     Huffman( String texto){
 
-        
+
         nodos = new ArrayList<>();
         textoOriginal = texto;
         ArrayDeSimbolos as = new ArrayDeSimbolos(texto);
@@ -33,6 +34,8 @@ public class Huffman {
                     Nodo hijoIzq = new Nodo(letra_probabilidad.get(i));
                     Nodo hijoDer = new Nodo(letra_probabilidad.get(i+1));
                     Nodo nuevoNodo = new Nodo(hijoIzq,hijoDer);
+                    nuevoNodo.hijoIzquierdo.padre = nuevoNodo;
+                    nuevoNodo.hijoDerecho.padre = nuevoNodo;
                     nodos.add(nuevoNodo);
                     Collections.sort(nodos);
                     i = i+2; //Matematicas hijo!!
@@ -41,6 +44,8 @@ public class Huffman {
                     Nodo nodoProbabilidad = nodos.get(0);
                     Nodo nuevoNodo = new Nodo(letra_probabilidad.get(i));
                     Nodo padre = new Nodo(nodoProbabilidad,nuevoNodo);
+                    padre.hijoIzquierdo.padre = padre;
+                    padre.hijoDerecho.padre = padre;
                     nodos.add(padre);
                     Collections.sort(nodos);
                 }
@@ -48,7 +53,7 @@ public class Huffman {
         }
 
         //Unir los subarboles
-       while (nodos.size() > 1){
+        while (nodos.size() > 1){
             Nodo primer = nodos.get(0);
             Nodo segundo = nodos.get(1);
             Nodo padre = new Nodo(primer,segundo);
@@ -57,10 +62,12 @@ public class Huffman {
             nodos.remove(0);
 
             nodos.add(padre);
-       }
-        //Recorrer el arbol y asignar codigos
+        }
+        //Asignar codigos y almacenarlo en String
+        codigoGenerado(nodos.get(0));
+        String txt = cifrado();
 
-
+        //Almacecnar datos en archivo
     }
 
     private void iniciar(Simbolo simbolo1, Simbolo simbolo2){
@@ -71,7 +78,7 @@ public class Huffman {
         Collections.sort(nodos);
     }
 
-    public void cifrado(){
+    public String cifrado(){
         String txtCifrado = "";
         for (int i =0;i<textoOriginal.length();i++){
             char c = textoOriginal.charAt(i);
@@ -81,14 +88,54 @@ public class Huffman {
                 }
             }
         }
-
-
-        //Guardar en un archivo .huff texto y arbol
-
+        return txtCifrado;
     }
 
     public void descromprimir(){
 
+
+    }
+
+    private void codigoGenerado(Nodo nodo) {
+        if (nodo.hijoIzquierdo!= null){
+            if (nodo.hijoIzquierdo.simbolo != null){
+                getCodigoBinario(nodo.hijoIzquierdo, "",nodo.hijoIzquierdo.simbolo);
+            }
+            codigoGenerado(nodo.hijoIzquierdo);
+        }else if (nodo.hijoDerecho != null){
+            if (nodo.hijoDerecho.simbolo != null){
+                getCodigoBinario(nodo.hijoDerecho, "",nodo.hijoDerecho.simbolo);
+            }
+            codigoGenerado(nodo.hijoDerecho);
+        }
+    }
+
+    private void getCodigoBinario(Nodo nodo, String s, Simbolo simba){
+        if (nodo.padre == null){
+            if (nodo.padre.hijoIzquierdo == nodo){
+                s = s+"0";
+                for (int i = s.length() - 1; 0 >= i; i--){
+                    noFinal = noFinal + s.charAt(i);
+                }
+                letra_prob.get(letra_prob.indexOf(simba)).setCodigo(noFinal);
+                noFinal = "";
+            }else{
+                s = s+"1";
+                for (int i = s.length() - 1; 0 >= i; i--){
+                    noFinal = noFinal + s.charAt(i);
+                }
+                letra_prob.get(letra_prob.indexOf(simba)).setCodigo(noFinal);
+                noFinal = "";
+            }
+        }else{
+            if (nodo.padre.hijoIzquierdo == nodo){
+                getCodigoBinario(nodo.padre,s + "0",simba);
+                //0
+            }else{
+                //1
+                getCodigoBinario(nodo.padre,s + "1",simba);
+            }
+        }
 
     }
 }

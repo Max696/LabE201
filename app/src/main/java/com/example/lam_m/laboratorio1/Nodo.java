@@ -4,16 +4,18 @@ import android.support.annotation.NonNull;
 
 public class Nodo implements Comparable<Nodo>{
 
-    private Nodo hijoIzquierdo;
-    private Nodo hijoDerecho;
+    public Nodo hijoIzquierdo;
+    public Nodo hijoDerecho;
+    public Nodo padre;
     private double probabilidad;
-    private Simbolo simbolo;
+    public Simbolo simbolo;
 
     Nodo(Nodo hijoIzquierdo, Nodo hijoDerecho){
         this.hijoIzquierdo = hijoIzquierdo;
         this.hijoDerecho = hijoDerecho;
         this.probabilidad = hijoIzquierdo.probabilidad + hijoDerecho.probabilidad;
         this.simbolo = null;
+        this.padre = null;
     }
 
     Nodo(Simbolo simbolo){
@@ -21,6 +23,7 @@ public class Nodo implements Comparable<Nodo>{
         this.probabilidad = simbolo.getFrecuencia();
         this.hijoIzquierdo = null;
         this.hijoDerecho = null;
+        this.padre = null;
     }
 
     public double getProbabilidad(){
