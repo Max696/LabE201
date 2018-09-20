@@ -125,10 +125,16 @@ public class MainActivity extends AppCompatActivity {
                 path = path.substring(path.indexOf(":")+1);
                // Toast.makeText(this, ""+path, Toast.LENGTH_SHORT).show();
                 txt_out.setText(readText(path));//texto
-                 hf = new Huffman(readText(path));
-                 codificacion = hf.cifrado1();
+                try {
+                    hf = new Huffman(readText(path));
+                    codificacion = hf.cifrado1();
 
-                Toast.makeText(this, "prueba", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "It works", Toast.LENGTH_SHORT).show();
+                }
+                catch (Exception e)
+                {
+                    Toast.makeText(this, ":( We try it", Toast.LENGTH_SHORT).show();
+                }
 
             }
         }
