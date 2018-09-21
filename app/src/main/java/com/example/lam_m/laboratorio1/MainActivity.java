@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 String filename =name.getText().toString();
 
                 try {
-                    saveTextAsFile(filename,codificacion);
+                    saveTextAsFile(filename,hf.metodoFinal());
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }

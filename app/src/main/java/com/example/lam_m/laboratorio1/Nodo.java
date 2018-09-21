@@ -34,14 +34,8 @@ public class Nodo implements Comparable<Nodo>{
     public int compareTo(@NonNull Nodo o) {
         if(this.probabilidad < o.probabilidad) {
             return -1;
-        } else if (o.probabilidad < this.probabilidad) {
+        } else  {
             return 1;
-        } else {
-            if (this.simbolo.getLetra() < o.simbolo.getLetra()) {
-                return -1;
-            } else {
-                return 1;
-            }
         }
     }
 }
