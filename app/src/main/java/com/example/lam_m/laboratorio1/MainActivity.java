@@ -39,10 +39,11 @@ public class MainActivity extends AppCompatActivity {
     private static final int READ_REQUEST_CODE= 42;
     Button btn_load,btn_save;
     TextView txt_out;
-    EditText name;
+    EditText name,nameunz;
     Huffman hf;
     String codificacion;
     String totalName="";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,8 +66,14 @@ public class MainActivity extends AppCompatActivity {
         }
         btn_load=(Button)findViewById(R.id.btn_load);
         btn_save =(Button)findViewById(R.id.bt_save);
+
+
+
+
         txt_out = (TextView)findViewById(R.id.tV_out);
         name = (EditText)findViewById(R.id.editText);
+
+         nameunz =(EditText)findViewById(R.id.editText2) ;
 
         btn_load.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,19 +82,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
+
         btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String filename =name.getText().toString();
+                String filename2 = nameunz.getText().toString();
+                hf.descromprimir(hf.metodoFinal());
 
                 try {
-                    saveTextAsFile(filename,hf.metodoFinal());
+                    saveTextAsFile(filename,filename2,hf.decompress(),hf.metodoFinal());
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
 
             }
         });
+
+
     }
     private String  readText(Uri uri) throws IOException {
 
@@ -102,13 +116,15 @@ public class MainActivity extends AppCompatActivity {
         reader.close();
         return stringBuilder.toString();
     }
-    private void performFileSearch()
+    public void performFileSearch()
     {
         Intent inten = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         inten.addCategory(Intent.CATEGORY_OPENABLE);
         inten.setType("text/*");
         startActivityForResult(inten,READ_REQUEST_CODE);
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -121,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     readText(uri);
                     String s = readText(uri);
+
                     hf = new Huffman(s);
                     codificacion = hf.cifrado1();
                 } catch (IOException e) {
@@ -132,14 +149,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void saveTextAsFile(String filename , String content ) throws FileNotFoundException {
+
+
+    private void saveTextAsFile(String filename , String filename2,String content2, String content ) throws FileNotFoundException {
         String fileName = filename+".huff";
+        String fileName2 = filename2+".txt";
         File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),fileName);
+        File file2 = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),fileName2);
         FileOutputStream fos = null;
         try
         {
            fos = new FileOutputStream(file);
             fos.write(content.getBytes());
+            fos.close();
+            Toast.makeText(this, "guardado",Toast.LENGTH_SHORT).show();
+
+            fos =null;
+            fos =new FileOutputStream(file2);
+            fos.write(content2.getBytes());
             fos.close();
             Toast.makeText(this, "guardado",Toast.LENGTH_SHORT).show();
 

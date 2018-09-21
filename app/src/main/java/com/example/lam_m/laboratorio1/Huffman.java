@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class Huffman {
 
@@ -16,46 +17,47 @@ public class Huffman {
     String arbolComprimido="";
     String toPrint;
     String finite="";
-    Huffman( String texto){
-
+    String desc ="";
+    Huffman(String texto){
 
         nodos = new ArrayList<>();
-        textoOriginal = texto;
         ArrayDeSimbolos as = new ArrayDeSimbolos(texto);
-        ArrayList<Simbolo> letra_probabilidad = as.getArray();
         letra_prob = new ArrayList<>();
+
+        ArrayList<Simbolo> letra_probabilidad = as.getArray();
+        textoOriginal = texto;
         letra_prob = letra_probabilidad;
+
         for (int i =0;i<letra_probabilidad.size();i++){
             if (i==0){
                 //Iniciando
-
                 iniciar(letra_probabilidad.get(0),letra_probabilidad.get(1));
                 i=1;
             }else {
                 if (letra_probabilidad.size()-i>2)
                 {
-                if (letra_probabilidad.get(i).getFrecuencia() + letra_probabilidad.get(i+1).getFrecuencia() <= nodos.get(0).getProbabilidad()) {
-                    //Se crea nuevo subarbol cuando las proximas dos frecuencais
-                    //Son menores o iguales a la primera frecuencia en nodos
-                    Nodo hijoIzq = new Nodo(letra_probabilidad.get(i));
-                    Nodo hijoDer = new Nodo(letra_probabilidad.get(i + 1));
-                    Nodo nuevoNodo = new Nodo(hijoIzq, hijoDer);
-                    nuevoNodo.hijoIzquierdo.padre = nuevoNodo;
-                    nuevoNodo.hijoDerecho.padre = nuevoNodo;
-                    nodos.add(nuevoNodo);
-                    Collections.sort(nodos);
-                    i = i + 1; //Matematicas hijo!!
-                }
-                else {
-                    //Se agregan al primer nodo del listado
-                    Nodo nodoProbabilidad = nodos.get(0);
-                    Nodo nuevoNodo = new Nodo(letra_probabilidad.get(i));
-                    Nodo padre = new Nodo(nodoProbabilidad,nuevoNodo);
-                    padre.hijoIzquierdo.padre = padre;
-                    padre.hijoDerecho.padre = padre;
-                    nodos.set(0,padre);
-                    Collections.sort(nodos);
-                }
+                    if (letra_probabilidad.get(i).getFrecuencia() + letra_probabilidad.get(i+1).getFrecuencia() <= nodos.get(0).getProbabilidad()) {
+                        //Se crea nuevo subarbol cuando las proximas dos frecuencais
+                        //Son menores o iguales a la primera frecuencia en nodos
+                        Nodo hijoIzq = new Nodo(letra_probabilidad.get(i));
+                        Nodo hijoDer = new Nodo(letra_probabilidad.get(i + 1));
+                        Nodo nuevoNodo = new Nodo(hijoIzq, hijoDer);
+                        nuevoNodo.hijoIzquierdo.padre = nuevoNodo;
+                        nuevoNodo.hijoDerecho.padre = nuevoNodo;
+                        nodos.add(nuevoNodo);
+                        Collections.sort(nodos);
+                        i = i + 1; //Matematicas hijo!!
+                    }
+                    else {
+                        //Se agregan al primer nodo del listado
+                        Nodo nodoProbabilidad = nodos.get(0);
+                        Nodo nuevoNodo = new Nodo(letra_probabilidad.get(i));
+                        Nodo padre = new Nodo(nodoProbabilidad,nuevoNodo);
+                        padre.hijoIzquierdo.padre = padre;
+                        padre.hijoDerecho.padre = padre;
+                        nodos.set(0,padre);
+                        Collections.sort(nodos);
+                    }
                 }else {
                     //Se agregan al primer nodo del listado
                     Nodo nodoProbabilidad = nodos.get(0);
@@ -109,7 +111,6 @@ public class Huffman {
         nodos.add(padre);
         Collections.sort(nodos);
     }
-
     public String cifrado(){
         String txtCifrado = "";
         for (int i =0;i<textoOriginal.length();i++){
@@ -132,7 +133,7 @@ public class Huffman {
         if (nodo.hijoIzquierdo != null){
             comprimirArbol(nodo.hijoIzquierdo,i*2);
         }
-         if (nodo.hijoDerecho != null){
+        if (nodo.hijoDerecho != null){
             comprimirArbol(nodo.hijoDerecho,i*2 +1);
         }
     }
@@ -142,29 +143,72 @@ public class Huffman {
     public void descromprimir(String texto){
 
         ArrayList<String> s = new ArrayList();
-        String[] arrOfStr = texto.split("\\|" );
         Map<Integer,Character> tree = new HashMap<Integer,Character>();
+        letra_prob = new ArrayList<>();
 
-        for(String a:arrOfStr){
+        int index = texto.indexOf('|');
+        String codigoBinario = texto.substring(0,index);
+        codigoBinario = codigoBinario.trim();
+        String arbolito = texto.substring(index,texto.length());
 
+        String[] arrOfBry = codigoBinario.split("\\ ");
+        String[] arrOfStr = arbolito.split("\\|" );
 
-            String [] letra = a.split(",");
+        for (int i = 1; i< arrOfStr.length; i++){
+            String[] letra = arrOfStr[i].split(",");
             int asd = Integer.valueOf(letra[0]);
             String Letra = letra[1];
             char fletra;
-            if(Letra.length() >1)
-            {
-                fletra='^';
-            }
-            else
-            {
-                fletra=Letra.charAt(0);
+            if (Letra.equals("nu")) {
+                fletra = '^';
+            } else {
+                fletra = Letra.charAt(0);
             }
             tree.put(asd, fletra);
-
         }
 
-        // TODO code application logic here
+        //Empezando a descomprimir
+        for (HashMap.Entry<Integer, Character> nodo: tree.entrySet() ) {
+            int i = nodo.getKey();
+            int aux = 0;
+            noFinal = "";
+            String codi = "";
+            while (i>1){
+                //Encontrar el codigo
+                if (i%2 == 0){
+                    codi = codi + "0";
+                }else{
+                    codi = codi + "1";
+                }
+                i = i/2;
+            }
+            //Darle la vuelta al coidgo y asignarlo
+           for (int e = codi.length() - 1; 0<=e; e--){
+                noFinal = noFinal + codi.charAt(e);
+            }
+            letra_prob.add(new Simbolo(nodo.getValue(),noFinal));
+        }
+
+        desc ="";
+        //Ahora para cada conjunto de numeros, encontrar el match y nos vamos
+        for (int v =0;v<arrOfBry.length;v++){
+            for (Simbolo item: letra_prob) {
+                if ((arrOfBry[v]).equals(item.getCodigo())){
+                    desc = desc + item.getLetra();
+
+                }
+            }
+
+        }
+        String qweq = "";
+        qweq = desc;
+    }
+    public  String decompress()
+    {
+        return  desc;
+    }
+    public String textoDescomprimido(){
+        return finite;
     }
     private void codigoGenerado(Nodo nodo) {
         if (nodo.hijoIzquierdo!= null){

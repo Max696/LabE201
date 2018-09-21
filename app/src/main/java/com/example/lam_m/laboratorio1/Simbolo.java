@@ -10,6 +10,11 @@ public class Simbolo {
         this.frecuencia = frecuencia;
     }
 
+    Simbolo(char letra, String codigo){
+        this.letra = letra;
+        this.codigo = codigo;
+    }
+
     public char getLetra() {
         return letra;
     }
