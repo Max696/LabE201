@@ -1,33 +1,32 @@
 package com.example.lam_m.laboratorio1;
 
-import android.support.annotation.NonNull;
+public class Simbolo {
+    private char letra;
+    private double frecuencia;
+    private String codigo;
 
-public class Simbolo implements Comparable<Simbolo>{
-    public char letra;
-    public double probablidad;
-
-    Simbolo(char letra, double probablidad){
+    Simbolo(char letra, double frecuencia){
         this.letra = letra;
-        this.probablidad = probablidad;
+        this.frecuencia = frecuencia;
     }
 
-    @Override
-    public int compareTo(Simbolo o) {
-        if(this.probablidad < o.probablidad)
-        {
-            return -1;
-        }
-        else if (o.probablidad < this.probablidad)
-        {
-            return 1;
-        }
-        else{
-            if (this.letra < o.letra){
-                return -1;
-            }
-            else{
-                return 1;
-            }
-        }
+    Simbolo(char letra, String codigo){
+        this.letra = letra;
+        this.codigo = codigo;
+    }
+
+    public char getLetra() {
+        return letra;
+    }
+
+    public double getFrecuencia() {
+        return frecuencia;
+    }
+
+    public void setCodigo(String codigo){
+        this.codigo = codigo;
+    }
+    public String getCodigo(){
+        return this.codigo;
     }
 }
