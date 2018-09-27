@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_SOTARGE= 1000;
     private static final int RQS_OPEN_DOCUMENT_TREE = 2;
     private static final int READ_REQUEST_CODE= 42;
+    public static final String EXTRA_MESSAGE = "com.example.lam_m.laboratorio1.MESSAGE";
     Button btn_load,btn_save;
     TextView txt_out;
     EditText name,nameunz;
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     String codificacion;
     String totalName="";
     Switch hfOrLzw;
+    String toPrint="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,10 +77,6 @@ public class MainActivity extends AppCompatActivity {
         }
         btn_load=(Button)findViewById(R.id.btn_load);
         btn_save =(Button)findViewById(R.id.bt_save);
-
-
-
-
         txt_out = (TextView)findViewById(R.id.tV_out);
         name = (EditText)findViewById(R.id.editText);
         nameunz =(EditText)findViewById(R.id.editText2) ;
@@ -101,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
       });
 
     }
-    private String  readText(Uri uri) throws IOException {
+    private String  readText(Uri uri) throws IOException    {
 
         InputStream input = getContentResolver().openInputStream(uri);
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
@@ -126,11 +124,11 @@ public class MainActivity extends AppCompatActivity {
         if (data != null) {
             Uri uri = data.getData();
             totalName = uri.getLastPathSegment();
+            String [] qw =totalName.split("/");
+            toPrint += qw[qw.length-1]+"\n";
+
             if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
                 String s = "";
-
-
-
 
                 try {
                     s=readText(uri);
@@ -140,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
                     if (!hol) {
                         hf = new Huffman(s);
                         codificacion = hf.cifrado1();
+
                     } else {
                         lzw = new LZW(s);
                         codificacion = lzw.textoComprimido;
@@ -193,11 +192,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void irCompresion(View view){
         Intent intent = new Intent(this, Compresiones.class);
+        intent.putExtra(EXTRA_MESSAGE,"Hola");
         startActivity(intent);
     }
 
     private void saveTextAsFile(String filename , String filename2,String content2, String content ,String path) throws FileNotFoundException {
-        String fileName = filename+".huff";
+        boolean hol = hfOrLzw.isChecked();
+        String fileName="";
+        if(!hol)
+        {  fileName = filename+".huff";
+            toPrint+= fileName+"\n"+path;
+        }
+        else
+        {fileName = filename+".lzw";
+            toPrint+= fileName+"\n"+path;
+        }
+
+
         String fileName2 = filename2+".txt";
 
 
