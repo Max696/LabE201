@@ -40,7 +40,7 @@
         android:layout_alignTop="@+id/bt_save"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Nombre Archivo comprido" />
+        android:hint="Nombre Archivo comprido" />
 
     <EditText
         android:id="@+id/editText2"
@@ -51,7 +51,7 @@
         android:layout_marginTop="136dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Archivo Descomprimido" />
+        android:hint="Archivo Descomprimido" />
 
     <Switch
         android:id="@+id/hforlzw"

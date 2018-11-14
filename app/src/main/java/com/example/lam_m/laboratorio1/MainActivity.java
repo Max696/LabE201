@@ -15,6 +15,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.provider.DocumentFile;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -43,19 +44,20 @@ import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int PERMISSION_REQUEST_SOTARGE= 1000;
+    private static final int PERMISSION_REQUEST_SOTARGE = 1000;
     private static final int RQS_OPEN_DOCUMENT_TREE = 2;
-    private static final int READ_REQUEST_CODE= 42;
+    private static final int READ_REQUEST_CODE = 42;
     public static final String EXTRA_MESSAGE = "com.example.lam_m.laboratorio1.MESSAGE";
-    Button btn_load,btn_save;
+    Button btn_load, btn_save;
     TextView txt_out;
-    EditText name,nameunz;
+    EditText name, nameunz;
     Huffman hf;
     LZW lzw;
-    String codificacion;
-    String totalName="";
+    String codificacion = "Hola ";
+    String decodificacion = "Adios";
+    String totalName = "";
     Switch hfOrLzw;
-    String toPrint="";
+    String toPrint = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,25 +65,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
 
         {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},PERMISSION_REQUEST_SOTARGE);
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, PERMISSION_REQUEST_SOTARGE);
 
         }
-        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
 
         {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1000);
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1000);
 
         }
-        btn_load=(Button)findViewById(R.id.btn_load);
-        btn_save =(Button)findViewById(R.id.bt_save);
-        txt_out = (TextView)findViewById(R.id.tV_out);
-        name = (EditText)findViewById(R.id.editText);
-        nameunz =(EditText)findViewById(R.id.editText2) ;
+        btn_load = (Button) findViewById(R.id.btn_load);
+        btn_save = (Button) findViewById(R.id.bt_save);
+        txt_out = (TextView) findViewById(R.id.tV_out);
+        name = (EditText) findViewById(R.id.editText);
+        nameunz = (EditText) findViewById(R.id.editText2);
         hfOrLzw = (Switch) findViewById(R.id.hforlzw);
+        hfOrLzw.setShowText(true);
 
+        String filename = name.getText().toString();
+        String filename2 = nameunz.getText().toString();
         btn_load.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -89,17 +94,37 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-      btn_save.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-              Intent intent = new Intent((Intent.ACTION_OPEN_DOCUMENT_TREE));
-              startActivityForResult(intent,RQS_OPEN_DOCUMENT_TREE);
+     /*
+        btn_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent((Intent.ACTION_OPEN_DOCUMENT_TREE));
+                startActivityForResult(intent,RQS_OPEN_DOCUMENT_TREE);
 
-          }
-      });
+            }
+        });*/
+        btn_save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String filename =name.getText().toString();
+                String filename2 = nameunz.getText().toString();
+                hf.descromprimir(hf.metodoFinal());
+
+                try {
+
+                    saveTextAsFile(filename,filename2,decodificacion,codificacion);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+
 
     }
-    private String  readText(Uri uri) throws IOException    {
+
+    private String readText(Uri uri) throws IOException {
 
         InputStream input = getContentResolver().openInputStream(uri);
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
@@ -112,112 +137,157 @@ public class MainActivity extends AppCompatActivity {
         reader.close();
         return stringBuilder.toString();
     }
-    public void performFileSearch()       {
+
+    public void performFileSearch() {
         Intent inten = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         inten.addCategory(Intent.CATEGORY_OPENABLE);
         inten.setType("text/*");
-        startActivityForResult(inten,READ_REQUEST_CODE);
+        startActivityForResult(inten, READ_REQUEST_CODE);
     }
+
+    //@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        boolean hol = hfOrLzw.isChecked();
-        if (data != null) {
+
+        /*if (data != null) {*/
             Uri uri = data.getData();
             totalName = uri.getLastPathSegment();
-            String [] qw =totalName.split("/");
-            toPrint += qw[qw.length-1]+"\n";
+            String[] qw = totalName.split("/");
+            toPrint += qw[qw.length - 1] + "\n";
 
-            if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            try {
                 String s = "";
 
-                try {
-                    s=readText(uri);
+                s = readText(uri);
+                hf = new Huffman(s);
+                lzw = new LZW(s);
+                if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
 
+                    if (!hfOrLzw.isChecked()) {
 
-
-                    if (!hol) {
-                        hf = new Huffman(s);
                         codificacion = hf.cifrado1();
+                        decodificacion = hf.decompress();
 
                     } else {
-                        lzw = new LZW(s);
+
                         codificacion = lzw.textoComprimido;
+                        decodificacion = lzw.deCompressArchivo(codificacion);
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            if (resultCode == Activity.RESULT_OK && requestCode == RQS_OPEN_DOCUMENT_TREE) {
-                Uri uriTree = data.getData();
-                String s = "";
-                try {
-                    s = readText(uri);
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
 
 
 
-                String path = "";
-                DocumentFile documentFile = DocumentFile.fromTreeUri(this, uriTree);
-                uriTree = documentFile.getUri();
-                Uri docUri = DocumentsContract.buildDocumentUriUsingTree(uriTree,
-                        DocumentsContract.getTreeDocumentId(uriTree));
-                path = getPath(this, docUri);
-                String filename = name.getText().toString();
-                String filename2 = nameunz.getText().toString();
+                if (resultCode == Activity.RESULT_OK && requestCode == RQS_OPEN_DOCUMENT_TREE) {
+                    Uri uriTree = data.getData();
+                    String path = "";
+                    DocumentFile documentFile = DocumentFile.fromTreeUri(this, uriTree);
+                    uriTree = documentFile.getUri();
+                    Uri docUri = DocumentsContract.buildDocumentUriUsingTree(uriTree,
+                            DocumentsContract.getTreeDocumentId(uriTree));
+                    path = getPath(this,docUri);
+
+                    String filename = name.getText().toString();
+                    String filename2 = nameunz.getText().toString();
 
 
-                try {
-                    if (!hol) {
-                        hf =new Huffman(s);
-                        codificacion = hf.cifrado1();
-                        saveTextAsFile(filename, filename2,hf.decompress(),hf.metodoFinal(), path);
+                    if (!hfOrLzw.isChecked()) {
+
+                        saveTextAsFile(filename, filename2, decodificacion, codificacion, path);
                         Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
                     } else {
-                        lzw = new LZW(s);
-                        saveTextAsFile(filename, filename2,lzw.deCompressArchivo(lzw.textoComprimido),lzw.textoComprimido, path);
+
+                        saveTextAsFile(filename, filename2, decodificacion, codificacion, path);
                         Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
                     }
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
 
                 }
 
+            } catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+                Toast.makeText(this, "Archivo no encontrado",Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
         }
-    }
 
-    public void irCompresion(View view){
+
+    public void irCompresion(View view) {
         Intent intent = new Intent(this, Compresiones.class);
-        intent.putExtra(EXTRA_MESSAGE,"Hola");
+        intent.putExtra(EXTRA_MESSAGE, "Hola");
         startActivity(intent);
     }
 
-    private void saveTextAsFile(String filename , String filename2,String content2, String content ,String path) throws FileNotFoundException {
+    private void saveTextAsFile(String filename, String filename2, String content2, String content, String path) throws FileNotFoundException {
         boolean hol = hfOrLzw.isChecked();
-        String fileName="";
-        if(!hol)
-        {  fileName = filename+".huff";
-            toPrint+= fileName+"\n"+path;
-        }
-        else
-        {fileName = filename+".lzw";
-            toPrint+= fileName+"\n"+path;
+        String fileName = "";
+        if (!hol) {
+            fileName = filename + ".huff";
+            toPrint += fileName + "\n" + path;
+        } else {
+            fileName = filename + ".lzw";
+            toPrint += fileName + "\n" + path;
         }
 
 
+        String fileName2 = filename2 + ".txt";
+
+
+        File file = new File(path, fileName);
+        File file2 = new File(path, fileName2);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file);
+            fos.write(content.getBytes());
+            fos.close();
+            Toast.makeText(this, "guardado", Toast.LENGTH_SHORT).show();
+
+
+            fos = new FileOutputStream(file2);
+            fos.write(content2.getBytes());
+            fos.close();
+            Toast.makeText(this, "guardado", Toast.LENGTH_SHORT).show();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Archivo no encontrado", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == PERMISSION_REQUEST_SOTARGE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permission not granted", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+    }
+
+    private void saveTextAsFile(String filename , String filename2,String content2, String content ) throws FileNotFoundException {
+        String fileName = "";
+        boolean hol = hfOrLzw.isChecked();
+        if (!hol) {
+            fileName = filename + ".huff";
+
+        } else {
+            fileName = filename + ".lzw";
+
+        }
         String fileName2 = filename2+".txt";
-
-
-        File file = new File(path,fileName);
-        File file2 = new File(path,fileName2);
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),fileName);
+        File file2 = new File(Environment.getExternalStorageDirectory().getAbsolutePath(),fileName2);
         FileOutputStream fos = null;
         try
         {
-           fos = new FileOutputStream(file);
+            fos = new FileOutputStream(file);
             fos.write(content.getBytes());
             fos.close();
             Toast.makeText(this, "guardado",Toast.LENGTH_SHORT).show();
@@ -242,23 +312,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode==PERMISSION_REQUEST_SOTARGE)
-        {
-            if(grantResults[0]==PackageManager.PERMISSION_GRANTED)
-            {
-                Toast.makeText(this,"Permission granted",Toast.LENGTH_SHORT).show();
-            }
-            else
-            {
-                Toast.makeText(this,"Permission not granted",Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
-    }
-
 
     public static String getPath(final Context context, final Uri uri) {
 
@@ -303,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 final String selection = "_id=?";
-                final String[] selectionArgs = new String[] {
+                final String[] selectionArgs = new String[]{
                         split[1]
                 };
 
@@ -327,8 +380,7 @@ public class MainActivity extends AppCompatActivity {
         return null;
     }
 
-    public static String getDataColumn(Context context, Uri uri, String selection,
-                                       String[] selectionArgs) {
+    public static String getDataColumn(Context context, Uri uri, String selection, String[] selectionArgs) {
 
         Cursor cursor = null;
         final String column = "_data";
@@ -354,7 +406,6 @@ public class MainActivity extends AppCompatActivity {
         return "com.android.externalstorage.documents".equals(uri.getAuthority());
     }
 
-
     public static boolean isDownloadsDocument(Uri uri) {
         return "com.android.providers.downloads.documents".equals(uri.getAuthority());
     }
@@ -362,7 +413,6 @@ public class MainActivity extends AppCompatActivity {
     public static boolean isMediaDocument(Uri uri) {
         return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
-
 
     public static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());

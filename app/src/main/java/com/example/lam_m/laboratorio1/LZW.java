@@ -89,13 +89,14 @@ public class LZW {
         String prueba1 = toComprimir(textoComprimido);//texto comprimido
         String arbolCOMP = treeCompress(a.toString());//Quedan numeros, se convierten a ascii
         arbolCOMP = toComprimir(arbolCOMP);//Arbol comprimido
-        textoComprimido = prueba1 + "â– " + arbolCOMP;//archivo final
+        textoComprimido = prueba1 + "◘" + arbolCOMP;//archivo final
     }
     public String deCompressArchivo(String textoComprimido){
+
         Map<Integer, String> khe = new HashMap<>();
         int cont = 1;
-        String qwerty = textoComprimido.substring(0, textoComprimido.indexOf("â– "));
-        String arbolinho = textoComprimido.substring(textoComprimido.indexOf("â– ") + 1, textoComprimido.length());
+        String qwerty = textoComprimido.substring(0, textoComprimido.indexOf("◘"));
+        String arbolinho = textoComprimido.substring(textoComprimido.indexOf("◘") + 1, textoComprimido.length());
         String prueba2 = deCompress(qwerty);
         String arbolDescomprimido = treeDecompress(arbolinho);
 
@@ -182,6 +183,17 @@ public class LZW {
             resultante = resultante + ascii;
         }
         resultante = resultante.substring(2, resultante.length()-2);
+        //String[]valores =
+        return resultante;
+    }
+
+    private String treeDecompress(String arbol) {
+        String resultante = "";
+        for (int i = 0; i < arbol.length(); i++) {
+            char character = arbol.charAt(i); // This gives the character 'a'
+            int ascii = (int) character;
+            resultante = resultante + ascii;
+        }
         String[] valores = resultante.split("4432");
         resultante = "";
         for (int i = 0; i < valores.length; i++) {
@@ -195,17 +207,6 @@ public class LZW {
             }else{//Letras enmedio
                 resultante = resultante + " " + Character.toString(c) + ",";
             }
-        }
-        //String[]valores =
-        return resultante;
-    }
-
-    private String treeDecompress(String arbol) {
-        String resultante = "";
-        for (int i = 0; i < arbol.length(); i++) {
-            char character = arbol.charAt(i); // This gives the character 'a'
-            int ascii = (int) character;
-            resultante = resultante + ascii;
         }
         return resultante;
     }
